@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MySPA01</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="Scripts/MySPA01.css" />
+    <style>
+        /* Don't show the not-yet-loaded templates */
+        [ws-template], [ws-children-template] { display: none; }
+    </style>
+    <script type="text/javascript" src="Scripts/MySPA01.head.js"></script>
+</head>
+<body>
+    <div>
+        <ul>
+            <li><b ws-onclick="SwitchToHome" href="#">Home</b></li>
+            <li><a ws-onclick="SwitchToCharting" href="#charting">Charting</a></li>
+            <li><a ws-onclick="SwitchToForms" href="#forms">Forms</a></li>
+        </ul>
+        <div ws-hole="Content"></div>
+    </div>
+
+    <div ws-children-template="FormsPage">
+        <h1>Forms</h1>
+        <p>Some text here....</p>
+        <div>
+            <input type="text" />
+            <input type="text" />
+            <input type="text" />
+        </div>
+    </div>
+    
+    <div ws-children-template="ChartingPage">
+        <h1>Charting</h1>
+        <p>Some text here....</p>
+        <div ws-hole="Chart"></div>
+    </div>
+
+    <div ws-children-template="HomePage">
+        <h1>My list of unique people</h1>
+        <ul ws-hole="ListContainer">
+            <li ws-template="ListItem">${Name}</li>
+        </ul>
+        <div>
+            <input ws-var="Name" placeholder="Name" />
+            <button ws-onclick="Add">Add</button>
+            <div>You are about to add: ${Name}</div>
+        </div>
+    </div>
+
+    <script type="module" src="Scripts/MySPA01.min.js"></script>
+</body>
+</html>
