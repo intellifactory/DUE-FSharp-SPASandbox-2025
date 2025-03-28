@@ -16,7 +16,8 @@
   <ItemGroup>
     <PackageReference Include="WebSharper" Version="8.0.0.540" />
     <PackageReference Include="WebSharper.Charting" Version="8.0.0.540" />
-    <PackageReference Include="WebSharper.ChartJs" Version="8.0.0.540" />    
+    <PackageReference Include="WebSharper.ChartJs" Version="8.0.0.540" />
+    <PackageReference Include="WebSharper.Forms" Version="8.0.0.540" />    
     <PackageReference Include="WebSharper.FSharp" Version="8.0.0.540" />    
     <PackageReference Include="WebSharper.Plotly" Version="8.0.0.540" />
     <PackageReference Include="WebSharper.UI" Version="8.0.0.540" />

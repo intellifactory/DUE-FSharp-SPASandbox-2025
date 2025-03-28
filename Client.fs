@@ -17,6 +17,7 @@ module Client =
         | [<EndPoint "/">] Home
         | [<EndPoint "/charting">] Charting
         | [<EndPoint "/forms">] Forms
+        | [<EndPoint "/counter">] Counter
 
     // The templates are loaded from the DOM, so you just can edit index.html
     // and refresh your browser, no need to recompile unless you add or remove holes.
@@ -73,9 +74,57 @@ module Client =
                 .Chart(Renderers.ChartJs.Render(chart, Size = Size(500, 300)))
                 .Doc()
 
+        open WebSharper.Forms
+
         let FormsPage() =
-            IndexTemplate.FormsPage()
+            let v = Var.Create ""
+            Form.Return (fun name email message -> name, email, message)
+            <*> (Form.Yield "" |> Validation.IsNotEmpty "Name should be non-empty")
+            <*> Form.Yield ""
+            <*> Form.Yield ""
+            |> Form.WithSubmit
+            |> Form.Run (fun (name, email, message) ->
+                async {
+                    // Call the server
+                    //let! out = Server.Echo <| sprintf "From %s(%s): %s" name email message
+                    let out = "TODO"
+                    // Propagate the result to the UI via `v`
+                    v := out
+                } |> Async.StartImmediate
+            )
+            |> Form.Render (fun name email message submitter ->
+                IndexTemplate.ContactForm()
+                    .Name(name)
+                    .Email(email)
+                    .Message(message)
+                    .Response(v.View)
+                    .OnSend(fun e -> submitter.Trigger())
+                    .Doc()
+            )
+
+        let storage = JS.Window.LocalStorage
+        let counter =
+            let curr = storage.GetItem "counter"
+            if curr = "" then
+                0
+            else
+                int curr
+            |> Var.Create
+
+        let CounterPage() =
+            IndexTemplate.CounterPage()
+                .Value(View.Map string counter.View)
+                .Decrement(fun e ->
+                    counter := counter.Value - 1
+                    storage.SetItem("counter", string counter.Value)
+                )
+                .Increment(fun e ->
+                    counter := counter.Value + 1
+                    storage.SetItem("counter", string counter.Value)
+                )
                 .Doc()
+
+
 
     // Create a router for our endpoints
     let router = Router.Infer<EndPoint>()
@@ -93,6 +142,7 @@ module Client =
                 | Home      -> Pages.HomePage()
                 | Charting  -> Pages.ChartPage()
                 | Forms     -> Pages.FormsPage()
+                | Counter   -> Pages.CounterPage()
             )
             |> Doc.EmbedView
 

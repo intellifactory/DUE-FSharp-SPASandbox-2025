@@ -15,8 +15,9 @@
     <div>
         <ul>
             <li><b ws-onclick="SwitchToHome" href="#">Home</b></li>
-            <li><a ws-onclick="SwitchToCharting" href="#charting">Charting</a></li>
-            <li><a ws-onclick="SwitchToForms" href="#forms">Forms</a></li>
+            <li><a href="#charting">Charting</a></li>
+            <li><a href="#forms">Forms</a></li>
+            <li><a href="#counter">Counter</a></li>
         </ul>
         <div ws-hole="Content"></div>
     </div>
@@ -30,7 +31,7 @@
             <input type="text" />
         </div>
     </div>
-    
+
     <div ws-children-template="ChartingPage">
         <h1>Charting</h1>
         <p>Some text here....</p>
@@ -46,6 +47,31 @@
             <input ws-var="Name" placeholder="Name" />
             <button ws-onclick="Add">Add</button>
             <div>You are about to add: ${Name}</div>
+        </div>
+    </div>
+
+    <div ws-children-template="CounterPage">
+        <p>This is the second page.</p>
+        <p>Counter: ${Value}</p>
+        <button ws-onclick="Decrement">-</button>
+        /
+        <button ws-onclick="Increment">+</button>
+    </div>
+
+    <div ws-children-template="ContactForm">
+        <label>Name</label>
+        <input ws-var="Name" type="text" />
+        <br />
+        <label>Email</label>
+        <input ws-var="Email" type="text" />
+        <br />
+        <label>Message</label>
+        <textarea ws-var="Message"></textarea>
+        <br />
+
+        <button ws-onclick="OnSend" type="submit">Click me!</button>
+        <div style="border:1px solid #ccc;padding:1em;">
+            <h2>${Response}</h2>
         </div>
     </div>
 
