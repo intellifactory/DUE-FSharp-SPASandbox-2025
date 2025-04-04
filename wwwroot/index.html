@@ -18,6 +18,7 @@
             <li><a href="#charting">Charting</a></li>
             <li><a href="#forms">Forms</a></li>
             <li><a href="#counter">Counter</a></li>
+            <li><a href="#calculator">Calculator</a></li>
         </ul>
         <div ws-hole="Content"></div>
     </div>
@@ -73,6 +74,26 @@
         <div style="border:1px solid #ccc;padding:1em;">
             <h2>${Response}</h2>
         </div>
+    </div>
+
+    <div ws-template="Calculator">
+        <label>Variable</label>
+        <input ws-var="Variable" type="text" />
+        <br />
+        <label>From</label>
+        <input ws-var="From" type="text" />
+        <br />
+        <label>To</label>
+        <input ws-var="To" type="text" />
+        <br />
+        <label>Formula</label>
+        <input ws-var="Formula" type="text" />
+        <br />
+        <input ws-var="Errors" type="text" style="color:red;" />
+        <br />
+
+        <button ws-onclick="OnSend" type="submit">Click me!</button>
+        <canvas ws-anchor="Canvas" width="1000" height="400"></canvas>
     </div>
 
     <script type="module" src="Scripts/MySPA01.min.js"></script>

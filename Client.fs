@@ -18,6 +18,7 @@ module Client =
         | [<EndPoint "/charting">] Charting
         | [<EndPoint "/forms">] Forms
         | [<EndPoint "/counter">] Counter
+        | [<EndPoint "/calculator">] Calculator
 
     // The templates are loaded from the DOM, so you just can edit index.html
     // and refresh your browser, no need to recompile unless you add or remove holes.
@@ -124,7 +125,63 @@ module Client =
                 )
                 .Doc()
 
+        open Calculator
+        open WebSharper.JavaScript
 
+        let line(ctx: CanvasRenderingContext2D, x1, y1, x2, y2) =
+            ctx.BeginPath()
+            ctx.MoveTo(x1, y1)
+            ctx.LineTo(x2, y2)
+            ctx.Stroke()
+
+        let evalAt e x =
+            let env = ["x", x]
+            Evaluator.Eval env e
+
+
+        let Calculator () =
+            Form.Return (fun v from ``to`` formula -> v, from, ``to``, formula)
+            <*> (Form.Yield "x" |> Validation.IsNotEmpty "Variable should be non-empty")
+            <*> (Form.Yield "-20" |> Validation.IsMatch "[0-9]+" "From should be a number")
+            <*> (Form.Yield "20" |> Validation.IsMatch "[0-9]+" "To should be a number")
+            <*> (Form.Yield "sin(x*x)*cos(x)" |> Validation.IsNotEmpty "Formula should be non-empty")
+            |> Form.WithSubmit
+            |> Form.Render (fun v from ``to`` formula submitter ->
+                IndexTemplate.Calculator()
+                    .Variable(v)
+                    .From(from)
+                    .To(``to``)
+                    .Formula(formula)
+                    .OnSend(fun node ->
+                        async {
+                            node.Vars.Errors := ""
+                            let! formula = node.Vars.Formula
+                            let! from = node.Vars.From
+                            let! ``to`` = node.Vars.To
+                            match formula with
+                            | Language.Expression (e, Language.Eof) ->
+                                let scaleX = 50.
+                                let scaleY = -50.
+                                let from = float from
+                                let ``to`` = float ``to``
+                                let ctx = As<HTMLCanvasElement>(node.Anchors.Canvas).GetContext "2d"
+                                ctx.ClearRect(0, 0, 1000, 1000)
+                                let skip = (``to`` - from) / 1000.
+                                [from .. skip .. ``to``]
+                                |> Seq.fold (fun (x1,y1) x2 ->
+                                    let y2 = evalAt e x2
+                                    line(ctx, 
+                                        x1*scaleX+500., y1*scaleY+200.,
+                                        x2*scaleX+500., y2*scaleY+200.)
+                                    (x2, y2)
+                                ) (from, evalAt e from)
+                                |> ignore
+                            | _ ->
+                                node.Vars.Errors := "Syntax error in formula, expecting an expression"
+                        } |> Async.StartImmediate
+                    )
+                    .Doc()
+            )
 
     // Create a router for our endpoints
     let router = Router.Infer<EndPoint>()
@@ -143,6 +200,7 @@ module Client =
                 | Charting  -> Pages.ChartPage()
                 | Forms     -> Pages.FormsPage()
                 | Counter   -> Pages.CounterPage()
+                | Calculator -> Pages.Calculator()
             )
             |> Doc.EmbedView
 
